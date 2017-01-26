@@ -35,3 +35,10 @@ def main(argv):
         print("An unknown error occured: ")
         print(error)
         quit()
+
+    print "acceleration X :", MC.X, " scaled: ", MC.X_scl
+    print "acceleration Y :", MC.Y, " scaled: ", MC.Y_scl
+    print "acceleration Z :", MC.Z, " scaled: ", MC.Z_scl
+
+    print "Rotation X: ", MC.get_x_rotation(MC.X_scl, MC.Y_scl, MC.Z_scl)
+    print "Rotation Y: ", MC.get_y_rotation(MC.X_scl, MC.Y_scl, MC.Z_scl)

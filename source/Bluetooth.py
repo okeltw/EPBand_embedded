@@ -15,6 +15,6 @@ class BluetoothController(object):
     def connect(self):
         print("Attempting connection...")
 
-        if(1):
+        if(False):
             raise ConnectionError("Failed to connect to Bluetooth Module")
         # TODO
