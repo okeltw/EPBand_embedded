@@ -10,9 +10,11 @@ from Bluetooth import BluetoothController
 import sys
 
 def main(argv):
+    print('starting')
     debug = False # send this where necessary to enable/disable debug
     # e.g. if debug: print(<debug info>)
 
+    '''
     try:
         opts, args = getopt.getopt(argv)
     except getopt.GetoptError:
@@ -23,11 +25,12 @@ def main(argv):
         if opt in ("-d", "--debug"):
             debug = True
             print("Debug mode enabled.")
-
+    '''
+    debug = True
 
     try:
         PC = PulseController()
-        MC = MotionController()
+        MC = MotionController(debug)
         BC = BluetoothController()
     except ConnectionError as error:
         print(error)
@@ -36,9 +39,10 @@ def main(argv):
         print(error)
         quit()
 
-    print "acceleration X :", MC.X, " scaled: ", MC.X_scl
-    print "acceleration Y :", MC.Y, " scaled: ", MC.Y_scl
-    print "acceleration Z :", MC.Z, " scaled: ", MC.Z_scl
+    print('a')
+    print("acceleration X :", MC.X, " scaled: ", MC.X_scl)
+    print("acceleration Y :", MC.Y, " scaled: ", MC.Y_scl)
+    print("acceleration Z :", MC.Z, " scaled: ", MC.Z_scl)
 
-    print "Rotation X: ", MC.get_x_rotation(MC.X_scl, MC.Y_scl, MC.Z_scl)
-    print "Rotation Y: ", MC.get_y_rotation(MC.X_scl, MC.Y_scl, MC.Z_scl)
+    print("Rotation X: ", MC.get_x_rotation(MC.X_scl, MC.Y_scl, MC.Z_scl))
+    print("Rotation Y: ", MC.get_y_rotation(MC.X_scl, MC.Y_scl, MC.Z_scl))

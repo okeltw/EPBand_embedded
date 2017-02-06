@@ -2,7 +2,7 @@
 The Motion (accelerometer && gyro) controller.
 """
 
-import read_word_2c from I2C.py
+import I2C
 
 class MotionController(object):
     """docstring for ."""
@@ -35,7 +35,7 @@ class MotionController(object):
 
         if(False):
             raise ConnectionError("Failed to connect to Motion Sensor")
-        elif(debug)
+        elif(debug):
             print("Connected to " + ADDRESS)
         # TODO
 
