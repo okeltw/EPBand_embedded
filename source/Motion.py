@@ -8,23 +8,36 @@ import math
 class MotionController(object):
     """docstring for ."""
 
-    ADDRESS = 0x68 # TODO: actual address
+    ADDRESS = 0x68
 
     power_mgmt_1 = 0x6b
     power_mgmt_2 = 0x6c
 
-    X_addr = 0x43
-    Y_addr = 0x45
-    Z_addr = 0x47
+    X_accel_addr = 0x3b
+    Y_accel_addr = 0x3d
+    Z_accel_addr = 0x3f
 
-    X = 0
-    X_scl = 0
-    Y = 0
-    Y_scl = 0
-    Z = 0
-    Z_scl = 0
+    X_gryo_addr = 0x43
+    Y_gyro_addr = 0x45
+    Z_gyro_addr = 0x47
 
-    scl_factor = 163.0
+    X_accel = 0
+    X_accel_scl = 0
+    X_gyro = 0
+    X_gyro_scl = 0
+    
+    Y_accel = 0
+    Y_accel_scl = 0
+    Y_gyro = 0
+    Y_gyro_scl = 0
+
+    Z_accel = 0
+    Z_accel_scl = 0
+    Z_gyro = 0
+    Z_gyro_scl = 0
+
+    accel_scl = 16384.0
+    gyro_scl = 131.0
 
     def __init__(self):
         print("Initializing Motion...")
@@ -58,12 +71,30 @@ class MotionController(object):
         return math.degrees(radians)
 
     def read(self):
-        self.X = read_word_2c(self.ADDRESS, self.X_addr)
-        self.X_scl = self.X / self.scl_factor
-        self.Y = read_word_2c(self.ADDRESS, self.Y_addr)
-        self.Y_scl = self.Y / self.scl_factor
-        self.Z = read_word_2c(self.ADDRESS, self.Z_addr)
-        self.Z_scl = self.Z / self.scl_factor
+        # X Accelerometer
+        self.X_accel = read_word_2c(self.ADDRESS, self.X_accel_addr)
+        self.X_accel_scl = self.X_accel / self.accel_scl
+
+        # X Gyroscope
+        self.X_gyro = read_word_2c(self.ADDRESS, self.X_gryo_addr)
+        self.X_gyro_scl = self.X_gyro / self.gyro_scl
+
+        # Y accelerometer
+        self.Y_accel = read_word_2c(self.ADDRESS, self.Y_accel_addr)
+        self.Y_accel_scl = self.Y_accel / self.accel_scl
+
+        # Y Gyroscope
+        self.Y_gyro = read_word_2c(self.ADDRESS, self.Y_gyro_addr)
+        self.Y_gyro_scl = self.Y_gyro / self.gyro_scl
+
+        # Z Accelerometer
+        self.Z_accel = read_word_2c(self.ADDRESS, self.Z_accel_addr)
+        self.Z_accel_scl = self.Z_accel / self.accel_scl
+
+        # Z Gyroscope
+        self.Z_gyro = read_word_2c(self.ADDRESS, self.Z_gyro_addr)
+        self.Z_gyro_scl = self.Z_gyro / self.gyro_scl
+        
         return None
 
     def wakeup(self):

@@ -26,11 +26,21 @@ except Exception as error:
 while 1:
     print(chr(27) + "[2J")
     MC.read()
-    print("acceleration X :", MC.X, " scaled: ", MC.X_scl)
-    print("acceleration Y :", MC.Y, " scaled: ", MC.Y_scl)
-    print("acceleration Z :", MC.Z, " scaled: ", MC.Z_scl)
 
-    print("Rotation X: ", MC.get_x_rotation(MC.X_scl, MC.Y_scl, MC.Z_scl))
-    print("Rotation Y: ", MC.get_y_rotation(MC.X_scl, MC.Y_scl, MC.Z_scl))
-    print("Rotation Z: ", MC.get_z_rotation(MC.X_scl, MC.Y_scl, MC.Z_scl))
-    time.sleep(0.5)
+    print("Gyro Data")
+    print("---------")
+
+    print("Gyro X: ", MC.X_gyro, " scaled:", MC.X_gyro_scl)
+    print("Gyro Y: ", MC.Y_gyro, " scaled:", MC.Y_gyro_scl)
+    print("Gyro Z: ", MC.Z_gyro, " scaled:", MC.Z_gyro_scl)
+
+    print("Accelerometer Data")
+    print("------------------")
+    print("acceleration X :", MC.X_accel, " scaled: ", MC.X_accel_scl)
+    print("acceleration Y :", MC.Y_accel, " scaled: ", MC.Y_accel_scl)
+    print("acceleration Z :", MC.Z_accel, " scaled: ", MC.Z_accel_scl)
+
+    print("Rotation X: ", MC.get_x_rotation(MC.X_accel_scl, MC.Y_accel_scl, MC.Z_accel_scl))
+    print("Rotation Y: ", MC.get_y_rotation(MC.X_accel_scl, MC.Y_accel_scl, MC.Z_accel_scl))
+    print("Rotation Z: ", MC.get_z_rotation(MC.X_accel_scl, MC.Y_accel_scl, MC.Z_accel_scl))
+    time.sleep(1)
