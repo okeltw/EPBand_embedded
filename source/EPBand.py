@@ -8,41 +8,29 @@ from Pulse import PulseController
 from Motion import MotionController
 from Bluetooth import BluetoothController
 import sys
+import time
 
-def main(argv):
-    print('starting')
-    debug = False # send this where necessary to enable/disable debug
-    # e.g. if debug: print(<debug info>)
+print('starting')
 
-    '''
-    try:
-        opts, args = getopt.getopt(argv)
-    except getopt.GetoptError:
-        print("Incorrect input options")
-        sys.exit(2)
+try:
+    PC = PulseController()
+    MC = MotionController()
+    BC = BluetoothController()
+except ConnectionError as error:
+    print(error)
+except Exception as error:
+    print("An unknown error occured: ")
+    print(error)
+    quit()
 
-    for opt, arg in opts:
-        if opt in ("-d", "--debug"):
-            debug = True
-            print("Debug mode enabled.")
-    '''
-    debug = True
-
-    try:
-        PC = PulseController()
-        MC = MotionController(debug)
-        BC = BluetoothController()
-    except ConnectionError as error:
-        print(error)
-    except Exception as error:
-        print("An unknown error occured: ")
-        print(error)
-        quit()
-
-    print('a')
+while 1:
+    print(chr(27) + "[2J")
+    MC.read()
     print("acceleration X :", MC.X, " scaled: ", MC.X_scl)
     print("acceleration Y :", MC.Y, " scaled: ", MC.Y_scl)
     print("acceleration Z :", MC.Z, " scaled: ", MC.Z_scl)
 
     print("Rotation X: ", MC.get_x_rotation(MC.X_scl, MC.Y_scl, MC.Z_scl))
     print("Rotation Y: ", MC.get_y_rotation(MC.X_scl, MC.Y_scl, MC.Z_scl))
+    print("Rotation Z: ", MC.get_z_rotation(MC.X_scl, MC.Y_scl, MC.Z_scl))
+    time.sleep(0.5)
