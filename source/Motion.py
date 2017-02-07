@@ -8,11 +8,14 @@ import math
 class MotionController(object):
     """docstring for ."""
 
+    # Base address for the data
     ADDRESS = 0x68
 
+    # Address for the powermanagement. Use 1 to wake from sleep. (2 is sleep?? Unconfirmed)
     power_mgmt_1 = 0x6b
     power_mgmt_2 = 0x6c
 
+    # Offsets for the data
     X_accel_addr = 0x3b
     Y_accel_addr = 0x3d
     Z_accel_addr = 0x3f
@@ -21,6 +24,7 @@ class MotionController(object):
     Y_gyro_addr = 0x45
     Z_gyro_addr = 0x47
 
+    # Initialize variables
     X_accel = 0
     X_accel_scl = 0
     X_gyro = 0
@@ -55,6 +59,7 @@ class MotionController(object):
             print("Connected to " + ADDRESS)
         # TODO
 
+    # Basic Math Functions. Self Explanatory.
     def dist(self, a, b):
         return math.sqrt((a*a)+(b*b))
 
@@ -71,6 +76,10 @@ class MotionController(object):
         return math.degrees(radians)
 
     def read(self):
+        """
+        Use the addresses above to collect and store MPU data
+        """
+        
         # X Accelerometer
         self.X_accel = read_word_2c(self.ADDRESS, self.X_accel_addr)
         self.X_accel_scl = self.X_accel / self.accel_scl
@@ -98,4 +107,7 @@ class MotionController(object):
         return None
 
     def wakeup(self):
+        """
+        Write the active power management state to MPU
+        """
         write_byte(self.ADDRESS, self.power_mgmt_1)
