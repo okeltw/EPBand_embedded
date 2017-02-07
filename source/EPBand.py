@@ -23,10 +23,16 @@ except Exception as error:
     print(error)
     quit()
 
+# main loop
 while 1:
+    #clear the screen.
     print(chr(27) + "[2J")
+    
+    # Tell Motion Controller to read the sensor data
     MC.read()
 
+    # Use the motion controller object to access the data.
+    # Display for user to see.
     print("Gyro Data")
     print("---------")
 
@@ -43,4 +49,6 @@ while 1:
     print("Rotation X: ", MC.get_x_rotation(MC.X_accel_scl, MC.Y_accel_scl, MC.Z_accel_scl))
     print("Rotation Y: ", MC.get_y_rotation(MC.X_accel_scl, MC.Y_accel_scl, MC.Z_accel_scl))
     print("Rotation Z: ", MC.get_z_rotation(MC.X_accel_scl, MC.Y_accel_scl, MC.Z_accel_scl))
+    
+    # sleep to give time for the screen to render. We also don't need instantaneous data, so let's not stress the pi.
     time.sleep(1)
