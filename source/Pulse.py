@@ -12,12 +12,12 @@ class PulseController(object):
     VALUE = GPIO.LOW
     OLD_VALUE = GPIO.LOW
     CHANNEL = None
-    
+
     def __init__(self):
         print("Initializing pulse sensor")
         #self.setup()
         #print("Setup")
-        
+
     def setup(self, channel):
         self.CHANNEL = channel
         GPIO.setmode(GPIO.BOARD)
@@ -62,9 +62,6 @@ class PulseController(object):
                 print("_____\t%s" % time.strftime("%H:%M:%S",time.gmtime()))
             else:
                 print("|||||\t%s" % time.strftime("%H:%M:%S",time.gmtime()))
-        
+
     def cleanup(self):
         GPIO.cleanup(self.CHANNEL)
-
-
-
