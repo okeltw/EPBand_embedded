@@ -10,6 +10,14 @@ import smbus
 
 bus = smbus.SMBus(1) # or 0 for rev1
 
+def write_byte(address, data):
+    """
+    Write a single byte [data] to address.
+    I think the third argument is offset, but I have not confirmed this.
+    """
+    bus.write_byte_data(address, data, 0)
+    return None
+
 def read_byte(address, offset):
     """
     Reads a single byte from address+offset
