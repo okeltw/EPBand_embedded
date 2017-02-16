@@ -54,5 +54,5 @@ class BluetoothController(object):
         Linear = str(x) + ',' + str(y) + ',' + str(z)
         Gyro = str(rx) + ',' + str(ry) + ',' + str(rz)
         data = 'Data/' + Time + '/LINEAR' + Linear + '/GYRO/' + Gyro
-        print "%s" % data
+        print("%s" % data)
         socket.send(data)

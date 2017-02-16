@@ -2,12 +2,8 @@
 The Motion (accelerometer && gyro) controller.
 """
 
-#from I2C import *
+from I2C import *
 import math
-
-#empty placeholder for desktop dev
-def read_word_2c(a,b):
-    return 16384.0
 
 class MotionController(object):
     """docstring for ."""
@@ -46,7 +42,8 @@ class MotionController(object):
 
     def connect(self):
         print("Attempting connection...")
-        #self.wakeup()
+        # Write the active power management state to MPU
+        write_byte(self.ADDRESS, self.power_mgmt_1)
 
         if(False):
             raise ConnectionError("Failed to connect to Motion Sensor")
@@ -105,8 +102,8 @@ class MotionController(object):
         """
         Reset dictionaries to empty lists.
         """
-        AccelData = {"X": [], "Y": [], "Z": [], "X_scl": [], "Y_scl": [], "Z_scl": []}
-        GyroData = {"X": [], "Y": [], "Z": [], "X_scl": [], "Y_scl": [], "Z_scl": []}
+        self.AccelData = {"X": [], "Y": [], "Z": [], "X_scl": [], "Y_scl": [], "Z_scl": []}
+        self.GyroData = {"X": [], "Y": [], "Z": [], "X_scl": [], "Y_scl": [], "Z_scl": []}
         return None
 
     def printall(self):
@@ -122,10 +119,3 @@ class MotionController(object):
         for d in ("X", "Y", "Z"):
             print("Accel ", d, ":\n", self.AccelData[d])
             print("Accel ", d, " Scaled:\n", self.AccelData[d + "_scl"])
-
-
-    def wakeup(self):
-        """
-        Write the active power management state to MPU
-        """
-        write_byte(self.ADDRESS, self.power_mgmt_1)

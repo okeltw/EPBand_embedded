@@ -3,8 +3,8 @@ Main File for EP Band embedded code
 Authors: Taylor Okel, Andrew Albert, Brandon Poplstein
 """
 
-#import smbus
-#from Pulse import PulseController
+import smbus
+from Pulse import PulseController
 from Motion import MotionController
 from Bluetooth import BluetoothController
 import sys
@@ -26,14 +26,17 @@ except Exception as error:
 # main loop
 counter = 0
 while 1:
-    # Tell Motion Controller to read the sensor data
-
+    # Send/Display data once a second
     if counter < 10:
-        counter += 10
+        counter += 1
     else:
+        counter = 0
+        print(chr(27) + "[2J")
         MC.printall()
         MC.clear()
 
+    # Tell Motion Controller to read the sensor data
     MC.read()
 
+    # Don't overload the PI
     time.sleep(0.1)
