@@ -31,19 +31,11 @@ class BluetoothController(object):
         for address in devs:
             device_name = bluetooth.lookup_name(address)
             if device_name == name:
-                """
-                if sys.version_info[0] < 3:
-                    print "Found bluetooth to pair %s at %s\n" % (device_name, address)
-                else:
-                """
                 print("Found bluetooth to pair %s at %s\n" % (device_name, address))
                 return address
-
-        if sys.version_info[0] < 3:
-            print "Could not find the device\n"
-        else:
-            print("Could not find the device\n")
-        return ""
+            else:
+                print("Could not find the device\n")
+                return ""
 
     def open_Bluetooth(self, device, port):
         self.sock.connect((device, port))
