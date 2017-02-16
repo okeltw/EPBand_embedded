@@ -2,8 +2,12 @@
 The Motion (accelerometer && gyro) controller.
 """
 
-from I2C import *
+#from I2C import *
 import math
+
+#empty placeholder for desktop dev
+def read_word_2c(a,b):
+    return 16384.0
 
 class MotionController(object):
     """docstring for ."""
@@ -15,6 +19,8 @@ class MotionController(object):
     power_mgmt_1 = 0x6b
     power_mgmt_2 = 0x6c
 
+
+
     # Offsets for the data
     X_accel_addr = 0x3b
     Y_accel_addr = 0x3d
@@ -24,21 +30,10 @@ class MotionController(object):
     Y_gyro_addr = 0x45
     Z_gyro_addr = 0x47
 
-    # Initialize variables
-    X_accel = 0
-    X_accel_scl = 0
-    X_gyro = 0
-    X_gyro_scl = 0
-    
-    Y_accel = 0
-    Y_accel_scl = 0
-    Y_gyro = 0
-    Y_gyro_scl = 0
 
-    Z_accel = 0
-    Z_accel_scl = 0
-    Z_gyro = 0
-    Z_gyro_scl = 0
+    # Initialize variables
+    AccelData = {"X": [], "Y": [], "Z": [], "X_scl": [], "Y_scl": [], "Z_scl": []}
+    GyroData = {"X": [], "Y": [], "Z": [], "X_scl": [], "Y_scl": [], "Z_scl": []}
 
     accel_scl = 16384.0
     gyro_scl = 131.0
@@ -47,11 +42,11 @@ class MotionController(object):
         print("Initializing Motion...")
         self.connect()
         print("Connected")
-       
+
 
     def connect(self):
         print("Attempting connection...")
-        self.wakeup()
+        #self.wakeup()
 
         if(False):
             raise ConnectionError("Failed to connect to Motion Sensor")
@@ -79,32 +74,55 @@ class MotionController(object):
         """
         Use the addresses above to collect and store MPU data
         """
-        
-        # X Accelerometer
-        self.X_accel = read_word_2c(self.ADDRESS, self.X_accel_addr)
-        self.X_accel_scl = self.X_accel / self.accel_scl
 
-        # X Gyroscope
-        self.X_gyro = read_word_2c(self.ADDRESS, self.X_gryo_addr)
-        self.X_gyro_scl = self.X_gyro / self.gyro_scl
+        val = read_word_2c(self.ADDRESS, self.X_accel_addr)
+        self.AccelData["X"] += [val]
+        self.AccelData["X_scl"] += [val / self.accel_scl ]
 
-        # Y accelerometer
-        self.Y_accel = read_word_2c(self.ADDRESS, self.Y_accel_addr)
-        self.Y_accel_scl = self.Y_accel / self.accel_scl
+        val = read_word_2c(self.ADDRESS, self.Y_accel_addr)
+        self.AccelData["Y"] += [val]
+        self.AccelData["Y_scl"] += [val / self.accel_scl ]
 
-        # Y Gyroscope
-        self.Y_gyro = read_word_2c(self.ADDRESS, self.Y_gyro_addr)
-        self.Y_gyro_scl = self.Y_gyro / self.gyro_scl
+        val = read_word_2c(self.ADDRESS, self.Z_accel_addr)
+        self.AccelData["Z"] += [val]
+        self.AccelData["Z_scl"] += [val / self.accel_scl ]
 
-        # Z Accelerometer
-        self.Z_accel = read_word_2c(self.ADDRESS, self.Z_accel_addr)
-        self.Z_accel_scl = self.Z_accel / self.accel_scl
+        val = read_word_2c(self.ADDRESS, self.X_accel_addr)
+        self.GyroData["X"] += [val]
+        self.GyroData["X_scl"] += [val / self.gyro_scl ]
 
-        # Z Gyroscope
-        self.Z_gyro = read_word_2c(self.ADDRESS, self.Z_gyro_addr)
-        self.Z_gyro_scl = self.Z_gyro / self.gyro_scl
-        
+        val = read_word_2c(self.ADDRESS, self.Y_accel_addr)
+        self.GyroData["Y"] += [val]
+        self.GyroData["Y_scl"] += [val / self.gyro_scl ]
+
+        val = read_word_2c(self.ADDRESS, self.Z_accel_addr)
+        self.GyroData["Z"] += [val]
+        self.GyroData["Z_scl"] += [val / self.gyro_scl ]
+
         return None
+
+    def clear(self):
+        """
+        Reset dictionaries to empty lists.
+        """
+        AccelData = {"X": [], "Y": [], "Z": [], "X_scl": [], "Y_scl": [], "Z_scl": []}
+        GyroData = {"X": [], "Y": [], "Z": [], "X_scl": [], "Y_scl": [], "Z_scl": []}
+        return None
+
+    def printall(self):
+        print("Gyroscope:")
+        print("----------")
+        for d in ("X", "Y", "Z"):
+            print("Gyro ", d, ":\n", self.GyroData[d])
+            print("Gyro ", d, " Scaled:\n", self.GyroData[d + "_scl"])
+            print()
+
+        print("\nAccelerometer:")
+        print("--------------")
+        for d in ("X", "Y", "Z"):
+            print("Accel ", d, ":\n", self.AccelData[d])
+            print("Accel ", d, " Scaled:\n", self.AccelData[d + "_scl"])
+
 
     def wakeup(self):
         """
