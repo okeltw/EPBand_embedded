@@ -11,22 +11,6 @@ class MotionController(object):
     # Base address for the data
     ADDRESS = 0x68
 
-    # Address for the powermanagement. Use 1 to wake from sleep. (2 is sleep?? Unconfirmed)
-    power_mgmt_1 = 0x6b
-    power_mgmt_2 = 0x6c
-
-
-
-    # Offsets for the data
-    X_accel_addr = 0x3b
-    Y_accel_addr = 0x3d
-    Z_accel_addr = 0x3f
-
-    X_gryo_addr = 0x43
-    Y_gyro_addr = 0x45
-    Z_gyro_addr = 0x47
-
-
     # Initialize variables
     AccelData = {"X": [], "Y": [], "Z": [], "X_scl": [], "Y_scl": [], "Z_scl": []}
     GyroData = {"X": [], "Y": [], "Z": [], "X_scl": [], "Y_scl": [], "Z_scl": []}
@@ -43,7 +27,7 @@ class MotionController(object):
     def connect(self):
         print("Attempting connection...")
         # Write the active power management state to MPU
-        write_byte(self.ADDRESS, self.power_mgmt_1)
+        write_byte(self.ADDRESS, regs['Pwr Mgmt 1'])
 
         if(False):
             raise ConnectionError("Failed to connect to Motion Sensor")
@@ -72,27 +56,27 @@ class MotionController(object):
         Use the addresses above to collect and store MPU data
         """
 
-        val = read_word_2c(self.ADDRESS, self.X_accel_addr)
+        val = read_word_2c(self.ADDRESS, regs['Accel X High'])
         self.AccelData["X"] += [val]
         self.AccelData["X_scl"] += [val / self.accel_scl ]
 
-        val = read_word_2c(self.ADDRESS, self.Y_accel_addr)
+        val = read_word_2c(self.ADDRESS, regs['Accel Y High'])
         self.AccelData["Y"] += [val]
         self.AccelData["Y_scl"] += [val / self.accel_scl ]
 
-        val = read_word_2c(self.ADDRESS, self.Z_accel_addr)
+        val = read_word_2c(self.ADDRESS, regs['Accel Z High'])
         self.AccelData["Z"] += [val]
         self.AccelData["Z_scl"] += [val / self.accel_scl ]
 
-        val = read_word_2c(self.ADDRESS, self.X_accel_addr)
+        val = read_word_2c(self.ADDRESS, regs['Gyro X High'])
         self.GyroData["X"] += [val]
         self.GyroData["X_scl"] += [val / self.gyro_scl ]
 
-        val = read_word_2c(self.ADDRESS, self.Y_accel_addr)
+        val = read_word_2c(self.ADDRESS, regs['Gyro Y High'])
         self.GyroData["Y"] += [val]
         self.GyroData["Y_scl"] += [val / self.gyro_scl ]
 
-        val = read_word_2c(self.ADDRESS, self.Z_accel_addr)
+        val = read_word_2c(self.ADDRESS, regs['Gyro Z High'])
         self.GyroData["Z"] += [val]
         self.GyroData["Z_scl"] += [val / self.gyro_scl ]
 

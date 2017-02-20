@@ -43,7 +43,7 @@ regs = {
     'I2C Slv4 DI'   : 0x35,
     'I2C Mst Staus' : 0x36, # [R] Shows the status of the interrupt generating signals
     'Int Pin Config': 0x37, # [R/W] Configures the behavior of the interrupt signals
-    'Int Enable'    : 0x38, # [R/W] Enables/Disables interrupt generation
+    'Int Enable'    : 0x38, # [R/W]Enables/Disables interrupt generation
     'Int Status'    : 0x3A, # [R] Shows the interupt status of each source
     'Accel X High'  : 0x3B, # [R] Stores the most recent accel measurements
     'Accel X Low'   : 0x3C,
