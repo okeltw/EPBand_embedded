@@ -27,7 +27,7 @@ class MotionController(object):
     def connect(self):
         print("Attempting connection...")
         # Write the active power management state to MPU
-        write_byte(self.ADDRESS, regs['Pwr Mgmt 1'])
+        write_byte(self.ADDRESS, regs['Pwr Mgmt 1'], 0)
 
         if(False):
             raise ConnectionError("Failed to connect to Motion Sensor")
@@ -103,3 +103,69 @@ class MotionController(object):
         for d in ("X", "Y", "Z"):
             print("Accel ", d, ":\n", self.AccelData[d])
             print("Accel ", d, " Scaled:\n", self.AccelData[d + "_scl"])
+
+    def SetSampleRate(self, value):
+        write_byte(self.ADDRESS, reg['Sample Rate'], value)
+
+    def GetSampleDivider(self):
+        return read_byte(self.ADDRESS, reg['Sample Rate'])
+
+    def GetSampleRate(self):
+        div = self.GetSampleDivider()
+        mask = 0b00000111 # Read only the last 3 bits
+        DLPF_Config = read_byte(self.ADDRESS, regs['Config']) & mask
+
+        if DLPF_Config == 0 or DLPF_Config == 7:
+            gyro_rate = 8000 # Hz
+        else:
+            gyro_rate = 1000 # Hz
+
+        return gyro_rate/(1+div)
+
+    def SetConfig(self, value):
+        """
+        Bits 7,6 N/A
+        Bits 5-3 EXT_SYNC_SET[2:0]
+        Bits 2-0 DLPF_CFG[2:0]
+        """
+        write_byte(self.ADDRESS, reg['Config'], value)
+
+    def GetConfig(self):
+        return read_byte(self.ADDRESS, regs['Config'])
+
+    def GetConfigExtSync(self):
+        mask = 0b00111000
+        shift = 3
+        return (self.GetConfig() & mask) >> shift
+
+    def GetConfigDLPFConfig(self):
+        mask = 0b00000111
+        return self.GetConfig() & mask
+
+    def SetGyroConfig(self, value):
+        write_byte(self.ADDRESS, reg['Gyro Config'], value)
+
+    def GetGyroConfig(self):
+        return read_byte(self.ADDRESSS, reg['Gyro Config'])
+
+    def GetGyroRange(self):
+        mask = 0b00011000
+        shift = 3
+        return (self.GetGyroConfig() & mask) >> shift
+
+    def SetAccelConfig(self, value):
+        write_byte(self.ADDRESS, reg['Accel Config'], value)
+
+    def GetAccelConfig(self):
+        return read_byte(self.ADDRESS, reg['Accel Config'])
+
+    def GetAccelRange(self):
+        mask = 0b00011000
+        shift = 3
+        return (self.GetAccelConfig() & mask) >> shift
+
+    def SetMotionThreshold(self, value):
+        write_byte(self.ADDRESS, reg['Motion Thresh'], value)
+
+    def GetMotionThreshold(self):
+        return read_byte(self.ADDRESS, reg['Motion Thresh'])

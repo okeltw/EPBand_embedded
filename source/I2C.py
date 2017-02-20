@@ -10,34 +10,33 @@ import smbus
 
 bus = smbus.SMBus(1) # or 0 for rev1
 
-def write_byte(address, data):
+def write_byte(address, register, data):
     """
-    Write a single byte [data] to address.
-    I think the third argument is offset, but I have not confirmed this.
+    Write a single byte [data] to register at address.
     """
-    bus.write_byte_data(address, data, 0)
+    bus.write_byte_data(address, register, data)
     return None
 
-def read_byte(address, offset):
+def read_byte(address, register):
     """
-    Reads a single byte from address+offset
+    Reads a single byte from register at address
     """
-    return bus.read_byte_data(address, offset)
+    return bus.read_byte_data(address, register)
 
-def read_word(address, offset):
+def read_word(address, register):
     """
-    Read a word from address + offset
+    Read a word from register at address
     """
-    high = bus.read_byte_data(address, offset)
-    low = bus.read_byte_data(address, offset+1)
+    high = bus.read_byte_data(address, register)
+    low = bus.read_byte_data(address, register+1)
     val = (high << 8) + low # Shift upper byte and append lower byte
     return val
 
 """
 Read a word and 2's complement it
 """
-def read_word_2c(address, offset):
-    val = read_word(address, offset)
+def read_word_2c(address, register):
+    val = read_word(address, register)
     if (val >= 0x8000):
         return -((65535 - val) +1)
     else:
