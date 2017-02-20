@@ -169,3 +169,30 @@ class MotionController(object):
 
     def GetMotionThreshold(self):
         return read_byte(self.ADDRESS, reg['Motion Thresh'])
+
+    def SetFIFOEnable(self, value):
+        write_byte(self.ADDRESS, reg['FIFO Enable'], value)
+
+    def GetFIFOEnable(self, value):
+        return read_byte(self.ADDRESS, reg['FIFO Enable'])
+
+    def EnableFIFO(self, sensors):
+        sensor_dict = {
+            'Temp'  : 0b10000000,
+            'XG'    : 0b01000000,
+            'YG'    : 0b00100000,
+            'ZG'    : 0b00010000,
+            'Accel' : 0b00001000
+        } #purposefully leaving off SLVs (doubt they will be utilized)
+
+        setting = 0b00000000
+        if type(sensors) == list:
+            for sensor in sensors:
+                setting |= sensor_dict[sensor]
+        elif type(sensors == str)
+            setting = self.SensorStrToByte(sensors)
+        # else set all to 0
+
+        self.SetFIFOEnable(setting)
+
+    def SetSingleMaster(self):
