@@ -3,6 +3,7 @@ The Motion (accelerometer && gyro) controller.
 """
 
 from I2C import *
+from MotionRegs import regs
 import math
 
 class MotionController(object):
@@ -14,6 +15,8 @@ class MotionController(object):
     # Initialize variables
     AccelData = {"X": [], "Y": [], "Z": [], "X_scl": [], "Y_scl": [], "Z_scl": []}
     GyroData = {"X": [], "Y": [], "Z": [], "X_scl": [], "Y_scl": [], "Z_scl": []}
+
+    TempData = []
 
     accel_scl = 16384.0
     gyro_scl = 131.0
@@ -80,6 +83,9 @@ class MotionController(object):
         self.GyroData["Z"] += [val]
         self.GyroData["Z_scl"] += [val / self.gyro_scl ]
 
+        val = read_word_2c(self.ADDRESS, regs['Temp High'])
+        self.TempData += [val/340 + 36.53] # degrees celcius
+
         return None
 
     def clear(self):
@@ -105,10 +111,10 @@ class MotionController(object):
             print("Accel ", d, " Scaled:\n", self.AccelData[d + "_scl"])
 
     def SetSampleRate(self, value):
-        write_byte(self.ADDRESS, reg['Sample Rate'], value)
+        write_byte(self.ADDRESS, regs['Sample Rate'], value)
 
     def GetSampleDivider(self):
-        return read_byte(self.ADDRESS, reg['Sample Rate'])
+        return read_byte(self.ADDRESS, regs['Sample Rate'])
 
     def GetSampleRate(self):
         div = self.GetSampleDivider()
@@ -128,7 +134,7 @@ class MotionController(object):
         Bits 5-3 EXT_SYNC_SET[2:0]
         Bits 2-0 DLPF_CFG[2:0]
         """
-        write_byte(self.ADDRESS, reg['Config'], value)
+        write_byte(self.ADDRESS, regs['Config'], value)
 
     def GetConfig(self):
         return read_byte(self.ADDRESS, regs['Config'])
@@ -143,10 +149,10 @@ class MotionController(object):
         return self.GetConfig() & mask
 
     def SetGyroConfig(self, value):
-        write_byte(self.ADDRESS, reg['Gyro Config'], value)
+        write_byte(self.ADDRESS, regs['Gyro Config'], value)
 
     def GetGyroConfig(self):
-        return read_byte(self.ADDRESSS, reg['Gyro Config'])
+        return read_byte(self.ADDRESSS, regs['Gyro Config'])
 
     def GetGyroRange(self):
         mask = 0b00011000
@@ -154,10 +160,22 @@ class MotionController(object):
         return (self.GetGyroConfig() & mask) >> shift
 
     def SetAccelConfig(self, value):
-        write_byte(self.ADDRESS, reg['Accel Config'], value)
+        write_byte(self.ADDRESS, regs['Accel Config'], value)
+
+    def SetAccelRange(self, value):
+        """
+        AFS_SEL     Full Scale Range
+        0           ± 2g
+        1           ± 4g
+        2           ± 8g
+        3           ± 16g
+        """
+        currentConfig = self.GetAccelConfig()
+        newConfig = currentConfig | (value << 3)
+        write_byte(self.ADDRESS, regs['Accel Config'], newConfig)
 
     def GetAccelConfig(self):
-        return read_byte(self.ADDRESS, reg['Accel Config'])
+        return read_byte(self.ADDRESS, regs['Accel Config'])
 
     def GetAccelRange(self):
         mask = 0b00011000
@@ -165,16 +183,16 @@ class MotionController(object):
         return (self.GetAccelConfig() & mask) >> shift
 
     def SetMotionThreshold(self, value):
-        write_byte(self.ADDRESS, reg['Motion Thresh'], value)
+        write_byte(self.ADDRESS, regs['Motion Thresh'], value)
 
     def GetMotionThreshold(self):
-        return read_byte(self.ADDRESS, reg['Motion Thresh'])
+        return read_byte(self.ADDRESS, regs['Motion Thresh'])
 
     def SetFIFOEnable(self, value):
-        write_byte(self.ADDRESS, reg['FIFO Enable'], value)
+        write_byte(self.ADDRESS, regs['FIFO Enable'], value)
 
     def GetFIFOEnable(self, value):
-        return read_byte(self.ADDRESS, reg['FIFO Enable'])
+        return read_byte(self.ADDRESS, regs['FIFO Enable'])
 
     def EnableFIFO(self, sensors):
         sensor_dict = {
@@ -189,10 +207,38 @@ class MotionController(object):
         if type(sensors) == list:
             for sensor in sensors:
                 setting |= sensor_dict[sensor]
-        elif type(sensors == str)
+        elif type(sensors) == str:
             setting = self.SensorStrToByte(sensors)
         # else set all to 0
 
         self.SetFIFOEnable(setting)
 
-    def SetSingleMaster(self):
+    def SetI2CMasterCtrl(self, value):
+        write_byte(self.ADDRESS, regs['I2C Mst Ctrl'], value)
+
+    def GetI2CMasterCtrl(self):
+        return read_byte(self.ADDRESS, regs['I2C Mst Ctrl'])
+
+    def SetIntPinConfig(self, value):
+        write_byte(self.ADDRESS, regs['Int Pin Config'], value)
+
+    def GetIntPinConfig(self):
+        return read_byte(self.ADDRESS, regs['Int Pin Config'])
+
+    def SetIntEnable(self, value):
+        write_byte(self.ADDRESS, regs['Int Enable'], value)
+
+    def GetIntEnable(self):
+        return read_byte(self.ADDRESS, regs['Int Enable'])
+
+    def GetIntStatus(self):
+        return read_byte(self.ADDRESS, regs['Int Status'])
+
+    def GetFIFOOverflowInt(self):
+        mask = 0b00010000
+        shift = 4
+        return (GetIntStatus() & mask) >> shift
+
+    def Reset(self):
+        value = 0b00000111
+        write_byte(self.ADDRESS)
