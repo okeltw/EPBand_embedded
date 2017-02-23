@@ -14,6 +14,7 @@ class PulseController(object):
     CHANNEL = None
 
     pulse_counter = 0
+    pulse = 0
 
     def __init__(self):
         print("Initializing pulse sensor")
@@ -82,7 +83,7 @@ class PulseController(object):
         Return a reading following the formula.
         Recommend calling reset immediately following this call.
         """
-        return pulse_counter * (60/Time)
+        pulse = pulse_counter * (60/Time)
 
     def Validate(self, reading):
         """

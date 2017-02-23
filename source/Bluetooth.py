@@ -10,8 +10,12 @@ import json
 class BluetoothController(object):
     """docstring for ."""
 
-    ADDRESS = "devicename" # TODO: actual address
+    ADDRESS = None # Set during connection
+    socket = None  # Set during connection
     sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+    name = "" #TODO
+    port = 0 #TODO
+
 
     def __init__(self):
         print("Initializing Bluetooth...")
@@ -20,10 +24,8 @@ class BluetoothController(object):
 
     def connect(self):
         print("Attempting connection...")
-
-        if(False):
-            raise ConnectionError("Failed to connect to Bluetooth Module")
-        # TODO
+        self.ADDRESS = self.get_device(self.name)
+        self.socket = self.open_Bluetooth(self.name, self.port)
 
     def get_device(self, name):
         devs = bluetooth.discover_devices()

@@ -24,6 +24,7 @@ except Exception as error:
     print(error)
     quit()
 
+BT.get_device()
 BT.open_Bluetooth
 
 pulse_channel = 0 #TODO
@@ -61,7 +62,8 @@ while 1:
         counter = 0
         print(chr(27) + "[2J")
         MC.printall()
-        print("\n\nBPM: " PC.Pulse_reading(elapsed_time))
+        PC.Pulse_reading(elapsed_time)
+        print("\n\nBPM: ", PC.pulse )
         MC.clear()
         PC.reset()
 
@@ -70,7 +72,12 @@ while 1:
     # Clear the FIFO Buffer
     MC.resetFIFO()
 
-    BT.send
+    AD = MC.AccelData
+    GD = MC.GyroData
+    BT.send(BT.socket,
+            PC.pulse,
+            AD["X_scl"], AD["Y_scl"], AD["Z_scl"],
+            GD["X_scl"], GD["Y_scl"], GD["Z_scl"])
 
     # Don't overload the PI
-    time.sleep(0.1)
+    time.sleep(sleep_time)

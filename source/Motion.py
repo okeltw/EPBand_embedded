@@ -31,12 +31,7 @@ class MotionController(object):
         print("Attempting connection...")
         # Write the active power management state to MPU
         write_byte(self.ADDRESS, regs['Pwr Mgmt 1'], 0)
-
-        if(False):
-            raise ConnectionError("Failed to connect to Motion Sensor")
-        elif(False):
-            print("Connected to " + ADDRESS)
-        # TODO
+        write_byte(self.ADDRESS, regs['Pwr Mgmt 2'], 0)
 
     # Basic Math Functions. Self Explanatory.
     def dist(self, a, b):
