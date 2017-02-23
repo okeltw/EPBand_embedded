@@ -13,15 +13,21 @@ class PulseController(object):
     OLD_VALUE = GPIO.LOW
     CHANNEL = None
 
+    pulse_counter = 0
+
     def __init__(self):
         print("Initializing pulse sensor")
         #self.setup()
         #print("Setup")
 
     def setup(self, channel):
+        """
+        I'm moving all of this to main. Unsure how an interrupt would work if
+        this remains in this class.
         self.CHANNEL = channel
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(channel, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+        """
 
     def measure(self):
         GPIO.input( self.CHANNEL)
@@ -62,6 +68,35 @@ class PulseController(object):
                 print("_____\t%s" % time.strftime("%H:%M:%S",time.gmtime()))
             else:
                 print("|||||\t%s" % time.strftime("%H:%M:%S",time.gmtime()))
+
+    def Pulse_callback(self):
+        """
+        Set the GPIO pin as an interrupt. Use this function as a callback.
+        Each time it is called, pulse_counter is incremented once.
+        Thus, multiply pulse_counter by a ratio of 60s/elapsed_time to get a BPM.
+        """
+        pulse_counter += 1
+
+    def Pulse_reading(self, Time):
+        """
+        Return a reading following the formula.
+        Recommend calling reset immediately following this call.
+        """
+        return pulse_counter * (60/Time)
+
+    def Validate(self, reading):
+        """
+        Sanity check on the reading.
+        If it is out of a normal heart range, or is drastically different (TODO),
+        reject the reading (display "Not Available" or some such)
+        """
+        if reading < low_thresh or reading > high_thresh
+            return False
+        else:
+            return True
+
+    def reset(self):
+        pulse_counter = 0
 
     def cleanup(self):
         GPIO.cleanup(self.CHANNEL)

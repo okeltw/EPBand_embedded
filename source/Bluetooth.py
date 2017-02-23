@@ -41,12 +41,15 @@ class BluetoothController(object):
         self.sock.connect((device, port))
         return sock
 
-    def send_HeartRate( socket, BPM ):
+
+    def send_HeartRate(self, socket, BPM ):
         #TODO: json string for heartrate
         Time = time.strftime("%H:%M:%S",time.gmtime())
         data = {"Data" : "BPM"}
         data = json.dumps(data)
         socket.send(data)
+
+
 
     def send_Accelerometer( socket, x, y, z, rx, ry, rz):
         #TODO: json string for accelerometer
@@ -55,4 +58,20 @@ class BluetoothController(object):
         Gyro = str(rx) + ',' + str(ry) + ',' + str(rz)
         data = 'Data/' + Time + '/LINEAR' + Linear + '/GYRO/' + Gyro
         print("%s" % data)
+        socket.send(data)
+
+    def send(self, socket, BPM, x, y, z, rx, ry, rz):
+        Time = time.strftime("%H:%M%S", time.gmtime())
+        data = {"Time"  : Time,
+                "BPM"   : str(BPM),
+                "Motion": {
+                    "X" : str(x),
+                    "Y" : str(y),
+                    "Z" : str(z),
+                    "RX": str(rx),
+                    "RY": str(ry),
+                    "RZ": str(rz)
+                }
+        }
+        data = json.dumps(data)
         socket.send(data)
