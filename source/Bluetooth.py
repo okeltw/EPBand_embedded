@@ -25,7 +25,7 @@ class BluetoothController(object):
             raise ConnectionError("Failed to connect to Bluetooth Module")
         # TODO
 
-    def get_iPhone(self, name):
+    def get_device(self, name):
         devs = bluetooth.discover_devices()
 
         for address in devs:

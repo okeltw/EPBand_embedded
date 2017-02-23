@@ -88,6 +88,52 @@ class MotionController(object):
 
         return None
 
+    def readFIFO(self):
+        """
+        Read all the data in the FIFO buffer.
+        """
+        num_samples = read_word(self.ADDRESS, regs['FIFO Cnt High'])
+
+        # FIFO Count holds the number of samples.
+        # The samples are stored in order from their register values.
+        # There are 6 values sampled, so step by 6 as each loop will grab each
+        # of these values.
+        for sample in range(0,num_samples+1, 6):
+            val = read_word_2c(self.ADDRESS, regs['FIFO R/W'])
+            self.AccelData["X"] += [val]
+            self.AccelData["X_scl"] += [val / self.accel_scl ]
+
+            val = read_word_2c(self.ADDRESS, regs['FIFO R/W'])
+            self.AccelData["Y"] += [val]
+            self.AccelData["Y_scl"] += [val / self.accel_scl ]
+
+            val = read_word_2c(self.ADDRESS, regs['FIFO R/W'])
+            self.AccelData["Z"] += [val]
+            self.AccelData["Z_scl"] += [val / self.accel_scl ]
+
+            val = read_word_2c(self.ADDRESS, regs['FIFO R/W'])
+            self.GyroData["X"] += [val]
+            self.GyroData["X_scl"] += [val / self.gyro_scl ]
+
+            val = read_word_2c(self.ADDRESS, regs['FIFO R/W'])
+            self.GyroData["Y"] += [val]
+            self.GyroData["Y_scl"] += [val / self.gyro_scl ]
+
+            val = read_word_2c(self.ADDRESS, regs['FIFO R/W'])
+            self.GyroData["Z"] += [val]
+            self.GyroData["Z_scl"] += [val / self.gyro_scl ]
+
+    def Overflow_callback(self):
+        mask = 0b00010000 # Pull out overflow bit
+        status = self.GetIntStatus()
+        # If the int status is overflow (it should be, no other ints are enabled)
+        if status & mask:
+            print('Overflow!')
+            self.readFIFO()
+            self.resetFIFO()
+        else:
+            print('Unknown Interrupt')
+
     def clear(self):
         """
         Reset dictionaries to empty lists.
@@ -109,6 +155,8 @@ class MotionController(object):
         for d in ("X", "Y", "Z"):
             print("Accel ", d, ":\n", self.AccelData[d])
             print("Accel ", d, " Scaled:\n", self.AccelData[d + "_scl"])
+
+
 
     def SetSampleRate(self, value):
         write_byte(self.ADDRESS, regs['Sample Rate'], value)
@@ -195,6 +243,12 @@ class MotionController(object):
         return read_byte(self.ADDRESS, regs['FIFO Enable'])
 
     def EnableFIFO(self, sensors):
+        #Enable the FIFO Buffer
+        user_control = read_byte(self.ADDRESS, regs['User Ctrl'])
+        user_control |= 0b01000000
+        write_byte(self.ADDRESS, regs['User Ctrl'], user_control)
+
+        # Dictionary to simplify activating bits
         sensor_dict = {
             'Temp'  : 0b10000000,
             'XG'    : 0b01000000,
@@ -225,6 +279,9 @@ class MotionController(object):
     def GetIntPinConfig(self):
         return read_byte(self.ADDRESS, regs['Int Pin Config'])
 
+    def SetOverflowInt(self):
+        self.SetIntEnable(0b00010000)
+
     def SetIntEnable(self, value):
         write_byte(self.ADDRESS, regs['Int Enable'], value)
 
@@ -238,6 +295,22 @@ class MotionController(object):
         mask = 0b00010000
         shift = 4
         return (GetIntStatus() & mask) >> shift
+
+    def resetFIFO(self):
+        """
+        This bit resets the FIFO buffer when set to 1 while FIFO_EN equals 0.
+        This bit automatically clears to 0 after the reset has been triggered.
+        """
+        # Disable the FIFO and reset the buffer
+        user_control = read_byte(self.ADDRESS, regs['User Ctrl'])
+        user_control ^= 0b01000100
+        write_byte(self.ADDRESS, regs['User Ctrl'], user_control)
+
+        # Sleep to let the FIFO clear? needs testing
+
+        # Reactivate the FIFO
+        user_control ^= 0b01000100
+        write_byte(self.ADDRESS, regs['User Ctrl'], user_control)
 
     def Reset(self):
         value = 0b00000111
