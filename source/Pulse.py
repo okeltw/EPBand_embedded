@@ -72,14 +72,19 @@ class PulseController(object):
             else:
                 print("|||||\t%s" % time.strftime("%H:%M:%S",time.gmtime()))
 
+    time_stamp = 0
     def Pulse_callback(self, val):
         """
         Set the GPIO pin as an interrupt. Use this function as a callback.
         Each time it is called, pulse_counter is incremented once.
         Thus, multiply pulse_counter by a ratio of 60s/elapsed_time to get a BPM.
         """
+        
+        #time_now = time.time()
+        #if time_now - self.time_stamp >= 0.65:
         self.pulse_counter += 1
-
+        #    self.time_stamp = time_now
+        
     def Pulse_reading(self, Time):
         """
         Return a reading following the formula.

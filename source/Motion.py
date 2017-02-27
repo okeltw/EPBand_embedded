@@ -93,7 +93,7 @@ class MotionController(object):
         Read all the data in the FIFO buffer.
         """
         num_samples = read_word(self.ADDRESS, regs['FIFO Cnt High'])
-        print(num_samples)
+        #print(num_samples)
 
         # FIFO Count holds the number of samples.
         # The samples are stored in order from their register values.
@@ -266,6 +266,7 @@ class MotionController(object):
             setting = self.SensorStrToByte(sensors)
         # else set all to 0
 
+        print(setting)
         self.SetFIFOEnable(setting)
 
     def SetI2CMasterCtrl(self, value):

@@ -27,7 +27,7 @@ except Exception as error:
 #BC.open_Bluetooth()
 
 pulse_channel = 40 #TODO
-motion_int_channel = 38 #TODO
+motion_int_channel = 8 #TODO
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(pulse_channel, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
@@ -45,13 +45,13 @@ GPIO.add_event_detect(motion_int_channel, GPIO.RISING, callback=MC.Overflow_call
 MC.SetSampleRate(255)
 
 # Enable the FIFO (The buffer intself and the individual measurements)
-MC.EnableFIFO(('XG','YG','ZG','Accel'))
+MC.SetFIFOEnable(0b01111000)
 
 # main loop
 
 counter = 0
 sleep_time = 0.1
-counter_thresh = 60
+counter_thresh = 10
 elapsed_time = sleep_time * counter_thresh
 while 1:
     # Send/Display data once a second
