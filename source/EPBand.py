@@ -9,7 +9,7 @@ from Motion import MotionController
 from Bluetooth import BluetoothController
 import sys
 import time
-from RPi.GPIO import GPIO
+import RPi.GPIO as GPIO
 
 print('starting')
 
@@ -24,10 +24,10 @@ except Exception as error:
     print(error)
     quit()
 
-BT.open_Bluetooth
+#BC.open_Bluetooth()
 
-pulse_channel = 0 #TODO
-motion_int_channel = 0 #TODO
+pulse_channel = 40 #TODO
+motion_int_channel = 38 #TODO
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(pulse_channel, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
@@ -61,7 +61,7 @@ while 1:
         counter = 0
         print(chr(27) + "[2J")
         MC.printall()
-        print("\n\nBPM: " PC.Pulse_reading(elapsed_time))
+        print("\n\nBPM: ", PC.Pulse_reading(elapsed_time))
         MC.clear()
         PC.reset()
 
@@ -70,7 +70,7 @@ while 1:
     # Clear the FIFO Buffer
     MC.resetFIFO()
 
-    BT.send
+    #BC.send
 
     # Don't overload the PI
     time.sleep(0.1)
