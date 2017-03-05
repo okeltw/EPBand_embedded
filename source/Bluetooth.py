@@ -11,11 +11,12 @@ class BluetoothController(object):
     """docstring for ."""
 
     ADDRESS = None # Set during connection
-    socket = None  # Set during connection
-    sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-    name = "" #TODO
-    port = 0 #TODO
+    server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+    port = 0
+    uuid = "1e0ca4ea-299d-4335-93eb-27fcfe7fa848" #does it matter what this is?
 
+    client_sock = 0
+    client_address = 0
 
     def __init__(self):
         print("Initializing Bluetooth...")
@@ -24,25 +25,16 @@ class BluetoothController(object):
 
     def connect(self):
         print("Attempting connection...")
-        self.ADDRESS = self.get_device(self.name)
-        self.socket = self.open_Bluetooth(self.name, self.port)
+        self.port = bluetooth.get_available_port(bluetooth.RFCOMM)
+        self.server_sock.bind("", port)
+        self.server_sock.listen(1)
+        print("Listening on port ", self.port)
+        bluetooth.advertise_service(self.server_sock, "EP Band", uuid)
+        client_sock,address = self.server_sock.accept()
 
-    def get_device(self, name):
-        devs = bluetooth.discover_devices()
-
-        for address in devs:
-            device_name = bluetooth.lookup_name(address)
-            if device_name == name:
-                print("Found bluetooth to pair %s at %s\n" % (device_name, address))
-                return address
-            else:
-                print("Could not find the device\n")
-                return ""
-
-    def open_Bluetooth(self, device, port):
-        self.sock.connect((device, port))
-        return sock
-
+    def close(self):
+        client_sock.close()
+        server_sock.close()
 
     def send_HeartRate(self, socket, BPM ):
         #TODO: json string for heartrate
@@ -50,8 +42,6 @@ class BluetoothController(object):
         data = {"Data" : "BPM"}
         data = json.dumps(data)
         socket.send(data)
-
-
 
     def send_Accelerometer( socket, x, y, z, rx, ry, rz):
         #TODO: json string for accelerometer
