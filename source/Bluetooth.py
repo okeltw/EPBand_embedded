@@ -30,7 +30,8 @@ class BluetoothController(object):
         self.server_sock.listen(1)
         print("Listening on port ", self.port)
         bluetooth.advertise_service(self.server_sock, "EP Band", uuid)
-        client_sock,address = self.server_sock.accept()
+        self.client_sock,self.client_address = self.server_sock.accept()
+        print("Connected to " self.client_address)
 
     def close(self):
         client_sock.close()
