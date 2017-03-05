@@ -30,8 +30,13 @@ class MotionController(object):
     def connect(self):
         print("Attempting connection...")
         # Write the active power management state to MPU
-        write_byte(self.ADDRESS, regs['Pwr Mgmt 1'], 0)
-        write_byte(self.ADDRESS, regs['Pwr Mgmt 2'], 0)
+        # Disable sleep, temperature sensor
+        write_byte(self.ADDRESS, regs['Pwr Mgmt 1'], 0b00001000)
+        write_byte(self.ADDRESS, regs['Pwr Mgmt 2'], 0b00001000)
+
+    def close(self):
+        # Put motion to sleep
+        write_byte(self.ADDRESS, regs['Pwr Mgmt 1'], 0b01000000)
 
     # Basic Math Functions. Self Explanatory.
     def dist(self, a, b):
