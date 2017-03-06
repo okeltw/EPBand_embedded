@@ -99,7 +99,7 @@ class MotionController(object):
         # The samples are stored in order from their register values.
         # There are 6 values sampled, so step by 6 as each loop will grab each
         # of these values.
-        for sample in range(0,num_samples+1, 6):
+        for sample in range(0,num_samples):
             val = read_word_2c(self.ADDRESS, regs['FIFO R/W'])
             self.AccelData["X"] += [val]
             self.AccelData["X_scl"] += [val / self.accel_scl ]
