@@ -10,8 +10,13 @@ import json
 class BluetoothController(object):
     """docstring for ."""
 
-    ADDRESS = "devicename" # TODO: actual address
-    sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+    ADDRESS = None # Set during connection
+    server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+    port = 0
+    uuid = "1e0ca4ea-299d-4335-93eb-27fcfe7fa848" #does it matter what this is?
+
+    client_sock = 0
+    client_address = 0
 
     def __init__(self):
         print("Initializing Bluetooth...")
@@ -20,27 +25,17 @@ class BluetoothController(object):
 
     def connect(self):
         print("Attempting connection...")
+        self.port = bluetooth.get_available_port(bluetooth.RFCOMM)
+        self.server_sock.bind("", port)
+        self.server_sock.listen(1)
+        print("Listening on port ", self.port)
+        bluetooth.advertise_service(self.server_sock, "EP Band", uuid)
+        self.client_sock,self.client_address = self.server_sock.accept()
+        print("Connected to " self.client_address)
 
-        if(False):
-            raise ConnectionError("Failed to connect to Bluetooth Module")
-        # TODO
-
-    def get_device(self, name):
-        devs = bluetooth.discover_devices()
-
-        for address in devs:
-            device_name = bluetooth.lookup_name(address)
-            if device_name == name:
-                print("Found bluetooth to pair %s at %s\n" % (device_name, address))
-                return address
-            else:
-                print("Could not find the device\n")
-                return ""
-
-    def open_Bluetooth(self, device, port):
-        self.sock.connect((device, port))
-        return sock
-
+    def close(self):
+        client_sock.close()
+        server_sock.close()
 
     def send_HeartRate(self, socket, BPM ):
         #TODO: json string for heartrate
@@ -48,8 +43,6 @@ class BluetoothController(object):
         data = {"Data" : "BPM"}
         data = json.dumps(data)
         socket.send(data)
-
-
 
     def send_Accelerometer( socket, x, y, z, rx, ry, rz):
         #TODO: json string for accelerometer
