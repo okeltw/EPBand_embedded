@@ -6,36 +6,60 @@ import bluetooth
 import sys
 import time
 import json
+import uuid as uuidHelper
+
+GET = "{req:GET}"
+SET = "{req:SET}"
 
 class BluetoothController(object):
     """docstring for ."""
 
     ADDRESS = None # Set during connection
-    server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+    server = None
     port = 0
-    uuid = "1e0ca4ea-299d-4335-93eb-27fcfe7fa848" #does it matter what this is?
+    MAC = None # set during init
+    uuidStr = "1e0ca4ea-299d-4335-93eb-27fcfe7fa848" #does it matter what this is?
+    uuidHex = ''
 
-    client_sock = 0
-    client_address = 0
+    client = None
+    clientInfo = None
 
     def __init__(self):
-        print("Initializing Bluetooth...")
+        self.server =  bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+        self.MAC = uuidHelper.getnode()
+        print("MAC: ", hex(self.MAC))
+        self.uuidHex = uuidHelper.UUID("{" + self.uuidStr + "}")
+        print("UUID (String): ", self.uuidStr)
+        print("UUID (Hex): ", self.uuidHex)
         self.connect()
-        print("Connected")
 
     def connect(self):
         print("Attempting connection...")
-        self.port = bluetooth.get_available_port(bluetooth.RFCOMM)
-        self.server_sock.bind("", port)
-        self.server_sock.listen(1)
+        self.port = 0
+        self.server.bind(("", self.port))
+        self.port = self.server.getsockname()[1]
+        self.server.listen(1)
         print("Listening on port ", self.port)
-        bluetooth.advertise_service(self.server_sock, "EP Band", uuid)
-        self.client_sock,self.client_address = self.server_sock.accept()
-        print("Connected to " self.client_address)
+        bluetooth.advertise_service(self.server, "EP Band", self.uuidStr)
+        print("Waiting for connection...")
+        self.client,self.clientInfo = self.server.accept()
+        print("Connected to ", self.clientInfo)
+
+    def monitor(self):
+        try:
+            request = client.recv(size)
+            if request:
+                return json.loads(request)
+            else:
+                return None
+        except:
+            print("Closing Socket")
+            self.close()
+            return "ERR!"
 
     def close(self):
-        client_sock.close()
-        server_sock.close()
+        self.client.close()
+        self.server.close()
 
     def send_HeartRate(self, socket, BPM ):
         #TODO: json string for heartrate
@@ -68,3 +92,9 @@ class BluetoothController(object):
         }
         data = json.dumps(data)
         socket.send(data)
+
+    def _send(self):
+        Time = time.strftime("%H:%M%S", time.gmtime())
+        data = { "Time:" : Time }
+        data = json.dumps(data)
+        self.client.send(data)

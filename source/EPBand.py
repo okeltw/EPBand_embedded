@@ -8,6 +8,7 @@ from Pulse import PulseController
 from Motion import MotionController
 from Bluetooth import BluetoothController
 import sys
+import thread
 import time
 from RPi.GPIO import GPIO
 
@@ -64,7 +65,6 @@ try:
             MC.printall()
             PC.Pulse_reading(elapsed_time)
             print("\n\nBPM: ", PC.pulse )
-            MC.clear()
             PC.reset()
 
         MC.read()
@@ -75,10 +75,17 @@ try:
                 PC.pulse,
                 AD["X_scl"], AD["Y_scl"], AD["Z_scl"],
                 GD["X_scl"], GD["Y_scl"], GD["Z_scl"])
+        request = BT.monitor()
+        if request == "ERR!":
+            break
+            #handle
+        elif request:
+            MC.set(request["param"], request["value"])
 
         # Don't overload the PI
         time.sleep(sleep_time)
-except KeyboardInterrupt:
+
+except:
     MC.close()
     PC.close()
     BT.close()

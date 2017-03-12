@@ -54,6 +54,9 @@ class MotionController(object):
         radians = math.atan2(z, self.dist(x,y))
         return math.degrees(radians)
 
+    def set(self, register, value):
+        write_byte(self.ADDRESS, regs[register], value)
+
     def read(self):
         """
         Use the addresses above to collect and store MPU data
@@ -99,7 +102,7 @@ class MotionController(object):
         # The samples are stored in order from their register values.
         # There are 6 values sampled, so step by 6 as each loop will grab each
         # of these values.
-        for sample in range(0,num_samples):
+        for sample in range(0,num_samples+1, 6):
             val = read_word_2c(self.ADDRESS, regs['FIFO R/W'])
             self.AccelData["X"] += [val]
             self.AccelData["X_scl"] += [val / self.accel_scl ]
