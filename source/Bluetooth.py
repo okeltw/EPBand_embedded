@@ -93,6 +93,11 @@ class BluetoothController(object):
         data = json.dumps(data)
         socket.send(data)
 
+    def sendDict(self, socket, data):
+        data["Time"] = time.strftime("%H:%M%S", time.gmtime())
+        data = json.dumps(data)
+        socket.send(data)
+
     def _send(self):
         Time = time.strftime("%H:%M%S", time.gmtime())
         data = { "Time:" : Time }
