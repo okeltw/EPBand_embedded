@@ -6,19 +6,18 @@ Authors: Taylor Okel, Andrew Albert, Brandon Poplstein
 import smbus
 from Pulse import PulseController
 from Motion import MotionController
-from Bluetooth import BluetoothController
 import sys
 #import thread
 import time
 import RPi.GPIO as GPIO
-import bluetooth
+from Bluetooth import BluetoothController
 
 print('starting')
 
 try:
     PC = PulseController()
     MC = MotionController()
-    BC = BluetoothController()
+    JSONDump = BluetoothController.JSONDump
 except ConnectionError as error:
     print(error)
 except Exception as error:
@@ -48,42 +47,37 @@ try:
     # Enable the FIFO (The buffer intself and the individual measurements)
     #MC.EnableFIFO(('XG','YG','ZG','Accel'))
 
+    # File Ops
+    filename = input("Filename for workout (no extension): ")
+    f = open(filename + ".json", "w+")
+
     # main loop
 
     counter = 0
     sleep_time = 0.1
-    counter_thresh = 60
+    counter_thresh = 50
     elapsed_time = sleep_time * counter_thresh
     time_per_loop = elapsed_time    
 
-    try:
-        while 1:
-            # Send/Display data once a second
-            if counter < counter_thresh:
-                counter += 1
-            else:
-                counter = 0
-                PC.Pulse_reading(elapsed_time)
-                AD = MC.AccelData
-                GD = MC.GyroData
-                BC.send(PC.pulse,
-                        AD["X_scl"], AD["Y_scl"], AD["Z_scl"],
-                        GD["X_scl"], GD["Y_scl"], GD["Z_scl"])
-                elapsed_time += time_per_loop
-                #PC.reset()
-                MC.clear()
+    while 1:
+        # Send/Display data once a second
+        if counter < counter_thresh:
+            counter += 1
+        else:
+            counter = 0
+            PC.Pulse_reading(elapsed_time)
+            AD = MC.AccelData
+            GD = MC.GyroData
+            f.write(JSONDump(PC.pulse, AD, GD)+"\n")
+            PC.reset()
+            MC.clear()
 
-            MC.read()
-            #request = BT.monitor()
-    
-            # Don't overload the PI
-            time.sleep(sleep_time)
-    except bluetooth.btcommon.BluetoothError:
-        print("Connection lost, restarting BT service...")
-        BC.reset() 
+        MC.read()
+
+        # Don't overload the PI
+        time.sleep(sleep_time)
 
 except KeyboardInterrupt:
     MC.close()
     PC.close()
-    BC.close()
     print("Successfully closed the service.")

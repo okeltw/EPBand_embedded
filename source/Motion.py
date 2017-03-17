@@ -64,30 +64,30 @@ class MotionController(object):
 
         val = read_word_2c(self.ADDRESS, regs['Accel X High'])
         self.AccelData["X"] += [val]
-        self.AccelData["X_scl"] += [val / self.accel_scl ]
+        self.AccelData["X_scl"] += [round(val/self.accel_scl, 2) ]
 
         val = read_word_2c(self.ADDRESS, regs['Accel Y High'])
         self.AccelData["Y"] += [val]
-        self.AccelData["Y_scl"] += [val / self.accel_scl ]
+        self.AccelData["Y_scl"] += [round(val/self.accel_scl, 2) ]
 
         val = read_word_2c(self.ADDRESS, regs['Accel Z High'])
         self.AccelData["Z"] += [val]
-        self.AccelData["Z_scl"] += [val / self.accel_scl ]
+        self.AccelData["Z_scl"] += [round(val/self.accel_scl, 2) ]
 
         val = read_word_2c(self.ADDRESS, regs['Gyro X High'])
         self.GyroData["X"] += [val]
-        self.GyroData["X_scl"] += [val / self.gyro_scl ]
+        self.GyroData["X_scl"] += [round(val/self.gyro_scl, 2) ]
 
         val = read_word_2c(self.ADDRESS, regs['Gyro Y High'])
         self.GyroData["Y"] += [val]
-        self.GyroData["Y_scl"] += [val / self.gyro_scl ]
+        self.GyroData["Y_scl"] += [round(val/self.gyro_scl, 2) ]
 
         val = read_word_2c(self.ADDRESS, regs['Gyro Z High'])
         self.GyroData["Z"] += [val]
-        self.GyroData["Z_scl"] += [val / self.gyro_scl ]
+        self.GyroData["Z_scl"] += [round(val/self.gyro_scl, 2) ]
 
-        val = read_word_2c(self.ADDRESS, regs['Temp High'])
-        self.TempData += [val/340 + 36.53] # degrees celcius
+        #val = read_word_2c(self.ADDRESS, regs['Temp High'])
+        #self.TempData += [val/340 + 36.53] # degrees celcius
 
         return None
 

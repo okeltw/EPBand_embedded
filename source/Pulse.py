@@ -31,7 +31,7 @@ class PulseController(object):
         """
 
     def close(self):
-        # Do nothing...for now
+        return # Do nothing...for now
 
     def measure(self):
         GPIO.input( self.CHANNEL)
@@ -73,20 +73,21 @@ class PulseController(object):
             else:
                 print("|||||\t%s" % time.strftime("%H:%M:%S",time.gmtime()))
 
-    def Pulse_callback(self):
+    def Pulse_callback(self, param):
         """
         Set the GPIO pin as an interrupt. Use this function as a callback.
         Each time it is called, pulse_counter is incremented once.
         Thus, multiply pulse_counter by a ratio of 60s/elapsed_time to get a BPM.
         """
-        pulse_counter += 1
+        print("[Pulse Callback] param: ", param)
+        self.pulse_counter += 1
 
     def Pulse_reading(self, Time):
         """
         Return a reading following the formula.
         Recommend calling reset immediately following this call.
         """
-        pulse = pulse_counter * (60/Time)
+        self.pulse = self.pulse_counter * (60/Time)
 
     def Validate(self, reading):
         """
@@ -94,13 +95,13 @@ class PulseController(object):
         If it is out of a normal heart range, or is drastically different (TODO),
         reject the reading (display "Not Available" or some such)
         """
-        if reading < low_thresh or reading > high_thresh
+        if reading < low_thresh or reading > high_thresh:
             return False
         else:
             return True
 
     def reset(self):
-        pulse_counter = 0
+        self.pulse_counter = 0
 
     def cleanup(self):
         GPIO.cleanup(self.CHANNEL)
