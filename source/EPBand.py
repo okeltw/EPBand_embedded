@@ -87,4 +87,5 @@ except KeyboardInterrupt:
     MC.close()
     PC.close()
     BC.close()
+    GPIO.cleanup()
     print("Successfully closed the service.")
