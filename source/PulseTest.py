@@ -11,10 +11,12 @@ channel = 8
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(channel, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-GPIO.add_event_detect(channel, GPIO.RISING, callback=PC.Pulse_callback, bouncetime=650)
+GPIO.add_event_detect(channel, GPIO.RISING, callback=PC.Pulse_callback, bouncetime=550)
 
 t = 10
 while 1:
     #do nothing...
     time.sleep(t)
-    print(PC.Pulse_reading(t))
+    PC.Pulse_reading(t)
+    print(PC.pulse)
+    PC.reset()

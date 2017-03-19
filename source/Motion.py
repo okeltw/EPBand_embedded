@@ -32,7 +32,7 @@ class MotionController(object):
         # Write the active power management state to MPU
         # Disable sleep, temperature sensor
         write_byte(self.ADDRESS, regs['Pwr Mgmt 1'], 0b00001000)
-        write_byte(self.ADDRESS, regs['Pwr Mgmt 2'], 0b00001000)
+        write_byte(self.ADDRESS, regs['Pwr Mgmt 2'], 0b00000000)
 
     def close(self):
         # Put motion to sleep
@@ -73,6 +73,7 @@ class MotionController(object):
         val = read_word_2c(self.ADDRESS, regs['Accel Z High'])
         self.AccelData["Z"] += [val]
         self.AccelData["Z_scl"] += [round(val/self.accel_scl, 2) ]
+        print("Z Val: ", self.AccelData["Z_scl"])
 
         val = read_word_2c(self.ADDRESS, regs['Gyro X High'])
         self.GyroData["X"] += [val]

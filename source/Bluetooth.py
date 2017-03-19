@@ -91,7 +91,7 @@ class BluetoothController(object):
     def send(self, BPM, x, y, z, rx, ry, rz):
         Time = time.strftime("%H:%M%S", time.gmtime())
         data = {"Time"  : Time,
-                "BPM"   : str(BPM),
+                "BPM"   : BPM,
                 "Motion": {
                     "X" : x,
                     "Y" : y,

@@ -18,6 +18,7 @@ print('starting')
 try:
     PC = PulseController()
     MC = MotionController()
+    time.sleep(2)
     BC = BluetoothController()
 except ConnectionError as error:
     print(error)
@@ -32,7 +33,7 @@ try:
 
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(pulse_channel, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-    GPIO.setup(motion_int_channel, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+    #GPIO.setup(motion_int_channel, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
     #Spawn a new thread to monitor this gpio pin. will increment pulse_counter by 1 each rising edge.
     GPIO.add_event_detect(pulse_channel, GPIO.RISING, bouncetime=450, callback=PC.Pulse_callback)
@@ -52,12 +53,12 @@ try:
 
     counter = 0
     sleep_time = 0.1
-    counter_thresh = 60
+    counter_thresh = 10
     elapsed_time = sleep_time * counter_thresh
     time_per_loop = elapsed_time    
 
-    try:
-        while 1:
+    while 1:
+        try:
             # Send/Display data once a second
             if counter < counter_thresh:
                 counter += 1
@@ -69,8 +70,8 @@ try:
                 BC.send(PC.pulse,
                         AD["X_scl"], AD["Y_scl"], AD["Z_scl"],
                         GD["X_scl"], GD["Y_scl"], GD["Z_scl"])
-                elapsed_time += time_per_loop
-                #PC.reset()
+                
+                PC.reset()
                 MC.clear()
 
             MC.read()
@@ -78,9 +79,9 @@ try:
     
             # Don't overload the PI
             time.sleep(sleep_time)
-    except bluetooth.btcommon.BluetoothError:
-        print("Connection lost, restarting BT service...")
-        BC.reset() 
+        except bluetooth.btcommon.BluetoothError:
+            print("Connection lost, restarting BT service...")
+            BC.reset() 
 
 except KeyboardInterrupt:
     MC.close()
