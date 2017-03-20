@@ -56,13 +56,18 @@ class PulseController(object):
         """
         #self.pulse_counter += 1
         self.record_pulse()
+        print("Pulse!")
 
     def Pulse_reading(self):
         """
         Return a reading following the formula.
         """
         #self.pulse = self.pulse_counter * (60/Time)
-        
+
+        if self.num_pulse_times <= 0:
+            self.pulse = 0
+            return        
+
         # Get the number of seconds elapsed
         elapsed_time_sec = self.pulse_times[-1] - self.pulse_times[0]
 
@@ -81,8 +86,9 @@ class PulseController(object):
             # Assuming the list is inorder from newest->oldest
             if (current_time - sample) > self.oldest_sample:
                 # Sample is older than the threshold. Remove.               
-                self.pulse_times = self.pulse_times[0:-1]
+                self.pulse_times = self.pulse_times[1:-1]
                 self.num_pulse_times -= 1
+                print("Sample removed")
             else:
                 # Sample is not older than the threshold, keep. 
                 # The remaining samples should likewise be valid, so we can break here.
