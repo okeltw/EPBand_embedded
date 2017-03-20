@@ -2,92 +2,91 @@
 The pulse/hearbeat sensor controller.
 """
 
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import sys
 import time
 from time import sleep
 
 class PulseController(object):
     ADDRESS = 0x00 # TODO: actual address
-    VALUE = GPIO.LOW
-    OLD_VALUE = GPIO.LOW
+    #VALUE = GPIO.LOW
+    #OLD_VALUE = GPIO.LOW
     CHANNEL = None
 
     pulse_counter = 0
     pulse = 0
 
+    start_time = time.time()
+
+    pulse_times = []
+    num_pulse_times = 0
+
+    # Oldest sample; max number of seconds
+    oldest_sample = 60 
+
     def __init__(self):
         print("Initializing pulse sensor")
-        #self.setup()
-        #print("Setup")
-
-    def setup(self, channel):
+        self.clear_pulse_times()    
+   
+    def clear_pulse_times(self):
+        self.pulse_times = []
+        self.num_pulse_times = 0
+    
+    def add_pulse_time(self, t):
         """
-        I'm moving all of this to main. Unsure how an interrupt would work if
-        this remains in this class.
-        self.CHANNEL = channel
-        GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(channel, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+        Append a time sample, t, to the pulse_time list
         """
+        self.pulse_times += [t]
+        self.num_pulse_times += 1
 
+    def record_pulse(self):
+        """
+        Append a time sample from time.time() to the pulse_time list
+        """
+        self.add_pulse_time(time.time())
+        
     def close(self):
-        return # Do nothing...for now
-
-    def measure(self):
-        GPIO.input( self.CHANNEL)
-        if self.VALUE == GPIO.LOW:
-            print("Channel %d is LOW\n" % self.CHANNEL)
-            return 0
-        else:
-            print("Channel %d is HIGH\n" % self.CHANNEL)
-            return 1
-
-    def edge_detect(self):
-        GPIO.wait_for_edge(self.CHANNEL, GPIO.RISING)
-        print("Rising edge\n")
-
-    def monitor(self):
-        while True:
-            self.edge_detect(self)
-            Time = time.strftime("%H:%M:%S",time.gmtime())
-            print("%s\n" % Time)
-
-    def monitor2(self):
-        while True:
-            self.VALUE = GPIO.input( self.CHANNEL)
-            if self.VALUE != self.OLD_VALUE:
-                Time = time.strftime("%H:%M:%S",time.gmtime())
-                self.OLD_VALUE = self.VALUE
-                if self.VALUE == GPIO.LOW:
-                    print("%s LOW" % Time)
-                else:
-                    print("%s HIGH\n" % Time)
-            if self.VALUE == GPIO.HIGH:
-                sleep(0.1)
-
-    def visualize(self):
-        while True:
-            self.VALUE = GPIO.input(self.CHANNEL)
-            if self.VALUE == GPIO.LOW:
-                print("_____\t%s" % time.strftime("%H:%M:%S",time.gmtime()))
-            else:
-                print("|||||\t%s" % time.strftime("%H:%M:%S",time.gmtime()))
+        self.cleanup()
+        return
 
     def Pulse_callback(self, param):
         """
         Set the GPIO pin as an interrupt. Use this function as a callback.
-        Each time it is called, pulse_counter is incremented once.
-        Thus, multiply pulse_counter by a ratio of 60s/elapsed_time to get a BPM.
+        Append a time sample to a list.
         """
-        print("[Pulse Callback] param: ", param)
-        self.pulse_counter += 1
+        #self.pulse_counter += 1
+        self.record_pulse()
 
-    def Pulse_reading(self, Time):
+    def Pulse_reading(self):
         """
         Return a reading following the formula.
-        Recommend calling reset immediately following this call.
         """
-        self.pulse = self.pulse_counter * (60/Time)
+        #self.pulse = self.pulse_counter * (60/Time)
+        
+        # Get the number of seconds elapsed
+        elapsed_time_sec = self.pulse_times[-1] - self.pulse_times[0]
+
+        # Determine the BPM by the number of samples over the elapsed time (minutes)
+        self.pulse = self.num_pulse_times / (elapsed_time_sec / 60)
+
+        # Obtain current time
+        current_time = time.time()
+
+        # Obtain a list in the opposite order
+        # I.e. Oldest sample to newest sample
+        old_pulse_times = self.pulse_times
+
+        # Purge the list of any samples older than sample threshold
+        for sample in old_pulse_times:
+            # Assuming the list is inorder from newest->oldest
+            if (current_time - sample) > self.oldest_sample:
+                # Sample is older than the threshold. Remove.               
+                self.pulse_times = self.pulse_times[0:-1]
+                self.num_pulse_times -= 1
+            else:
+                # Sample is not older than the threshold, keep. 
+                # The remaining samples should likewise be valid, so we can break here.
+                break
 
     def Validate(self, reading):
         """
@@ -102,6 +101,7 @@ class PulseController(object):
 
     def reset(self):
         self.pulse_counter = 0
+    
 
     def cleanup(self):
         GPIO.cleanup(self.CHANNEL)

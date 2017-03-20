@@ -1,22 +1,15 @@
-import RPi.GPIO as GPIO
+from RPi import GPIO
 from Pulse import PulseController
-import sys
 import time
 
 PC = PulseController()
 
-flag = False
-
-channel = 8
-
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(channel, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-GPIO.add_event_detect(channel, GPIO.RISING, callback=PC.Pulse_callback, bouncetime=550)
+GPIO.setup(8, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.add_event_detect(8, GPIO.RISING, bouncetime=400, callback=PC.Pulse_callback)
 
-t = 10
 while 1:
-    #do nothing...
-    time.sleep(t)
-    PC.Pulse_reading(t)
-    print(PC.pulse)
-    PC.reset()
+    sleep(10)
+    PC.Pulse_reading()
+    print("Pulse Reading:", PC.pulse)
+    print("Number of Samples", PC.num_pulse_times)
